@@ -28,7 +28,7 @@ const Footer = () => {
           <h3>Contact Us</h3>
           <ul>
             <li>
-              <a href="tel:+250781157944">📞 +250781157944</a>
+              <a href="tel:+250794766253">📞 +250794766253</a>
             </li>
             <li>
               <a href="mailto:info@cctravels.org">✉️ info@cctravels.org</a>

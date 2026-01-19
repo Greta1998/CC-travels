@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import Slideshow from '../components/Slideshow'
+import { API_URL } from '../config/api'
 import './Home.css'
 import rwandairLogo from '../airlines/RwandAir.png'
 import ethiopianLogo from '../airlines/ethiopian.png'
@@ -146,7 +147,7 @@ const Home = () => {
     setSubmitMessage('')
 
     try {
-      const response = await fetch('/api/book-flight', {
+      const response = await fetch(`${API_URL}/api/book-flight`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

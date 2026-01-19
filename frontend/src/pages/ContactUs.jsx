@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { API_URL } from '../config/api'
 import './ContactUs.css'
 
 const ContactUs = () => {
@@ -25,7 +26,7 @@ const ContactUs = () => {
     setSubmitMessage('')
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch(`${API_URL}/api/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
