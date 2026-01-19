@@ -68,6 +68,9 @@ const Footer = () => {
         <div className="footer-section">
           <h3>Working Hours</h3>
           <ul>
+          <li>
+              <span>24/7 Online Support</span>
+            </li>
             <li>
               <span>Monday - Friday</span>
               <span>9:00 AM - 6:00 PM</span>

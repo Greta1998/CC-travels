@@ -87,7 +87,7 @@ const ContactUs = () => {
                 <div className="contact-icon">📞</div>
                 <h3>Phone</h3>
                 <a href="tel:+250794766253">+250794766253</a>
-                <p>Mon - Fri: 9:00 AM - 6:00 PM</p>
+                <p>24/7 Support</p>
               </div>
 
               <div className="contact-card">
