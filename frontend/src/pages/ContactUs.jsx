@@ -86,7 +86,7 @@ const ContactUs = () => {
               <div className="contact-card">
                 <div className="contact-icon">📞</div>
                 <h3>Phone</h3>
-                <a href="tel:+250781157944">+250 781 157 944</a>
+                <a href="tel:+250794766253">+250794766253</a>
                 <p>Mon - Fri: 9:00 AM - 6:00 PM</p>
               </div>
 
