@@ -1,0 +1,241 @@
+.slideshow-container {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 72px);
+  overflow: hidden;
+  margin: 0;
+}
+
+.slide-welcome-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
+  padding: 2rem;
+  padding-bottom: 4rem;
+  text-align: center;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.slide-welcome-text h1 {
+  color: white;
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 
+    0 0 2px #D4AF37,
+    0 0 4px #D4AF37,
+    0 0 6px #D4AF37,
+    0 4px 12px rgba(0, 0, 0, 0.6);
+  -webkit-text-stroke: 1px #D4AF37;
+  letter-spacing: 0.05em;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
+}
+
+.slideshow-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.slide-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  padding: 2rem;
+  color: white;
+}
+
+.slide-title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.slideshow-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #111827;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.slideshow-button:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.slideshow-button.prev {
+  left: 1rem;
+}
+
+.slideshow-button.next {
+  right: 1rem;
+}
+
+.slideshow-indicators {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.indicator.active {
+  background: white;
+  width: 32px;
+  border-radius: 6px;
+}
+
+.indicator:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .slideshow-container {
+    height: calc(100vh - 72px);
+    min-height: 400px;
+  }
+
+  .slide-welcome-text {
+    padding: 1.5rem 1rem;
+    padding-bottom: 3rem;
+  }
+
+  .slide-welcome-text h1 {
+    font-size: 2.25rem;
+    letter-spacing: 0.03em;
+    -webkit-text-stroke: 0.75px #D4AF37;
+  }
+
+  .slide-title {
+    font-size: 1.5rem;
+  }
+
+  .slideshow-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+
+  .slideshow-button.prev {
+    left: 0.5rem;
+  }
+
+  .slideshow-button.next {
+    right: 0.5rem;
+  }
+
+  .slideshow-indicators {
+    bottom: 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .indicator {
+    width: 10px;
+    height: 10px;
+  }
+
+  .indicator.active {
+    width: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .slideshow-container {
+    height: calc(100vh - 72px);
+    min-height: 350px;
+  }
+
+  .slide-welcome-text {
+    padding: 1rem 0.75rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .slide-welcome-text h1 {
+    font-size: 1.75rem;
+    letter-spacing: 0.02em;
+    -webkit-text-stroke: 0.5px #D4AF37;
+  }
+
+  .slideshow-button {
+    width: 35px;
+    height: 35px;
+    font-size: 1.25rem;
+  }
+
+  .slideshow-button.prev {
+    left: 0.25rem;
+  }
+
+  .slideshow-button.next {
+    right: 0.25rem;
+  }
+
+  .slideshow-indicators {
+    bottom: 0.5rem;
+    gap: 0.3rem;
+  }
+
+  .indicator {
+    width: 8px;
+    height: 8px;
+  }
+
+  .indicator.active {
+    width: 20px;
+  }
+}

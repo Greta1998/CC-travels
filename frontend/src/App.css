@@ -1,0 +1,24 @@
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
+
+main {
+  flex: 1;
+  padding-top: 72px; /* Account for fixed navbar */
+}
+
+/* Ensure proper mobile viewport */
+@media (max-width: 768px) {
+  main {
+    padding-top: 72px;
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    padding-top: 72px;
+  }
+}

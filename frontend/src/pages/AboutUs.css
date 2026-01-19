@@ -1,0 +1,278 @@
+.about-page {
+  min-height: calc(100vh - 72px);
+  background: #fafafa;
+  padding-top: 0;
+}
+
+.about-hero {
+  background: linear-gradient(135deg, #0a1628 0%, #1a2f4f 100%);
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&q=80') center/cover;
+  opacity: 0.15;
+  z-index: 0;
+}
+
+.about-hero h1 {
+  position: relative;
+  z-index: 1;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #D4AF37;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.about-subtitle {
+  position: relative;
+  z-index: 1;
+  font-size: 1.25rem;
+  color: #e5e7eb;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+}
+
+.about-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+.about-section {
+  margin-bottom: 4rem;
+}
+
+.about-section h2 {
+  color: #111827;
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  letter-spacing: -0.025em;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.about-section h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: #D4AF37;
+  border-radius: 2px;
+}
+
+.about-section p {
+  color: #374151;
+  font-size: 1.125rem;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin: 3rem 0;
+}
+
+.about-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.about-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.2);
+  border-color: #D4AF37;
+}
+
+.card-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.about-card h3 {
+  color: #111827;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #D4AF37;
+}
+
+.about-card p {
+  color: #6b7280;
+  font-size: 1rem;
+  line-height: 1.7;
+  text-align: left;
+  margin: 0;
+}
+
+.values-section {
+  margin-top: 4rem;
+}
+
+.values-intro {
+  color: #6b7280;
+  font-size: 1.125rem;
+  margin-bottom: 2.5rem !important;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.value-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  border-left: 4px solid #D4AF37;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.value-card:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.15);
+}
+
+.value-card h4 {
+  color: #111827;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #D4AF37;
+}
+
+.value-card p {
+  color: #6b7280;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  text-align: left;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .about-hero {
+    padding: 3rem 1.5rem;
+  }
+
+  .about-hero h1 {
+    font-size: 2rem;
+  }
+
+  .about-subtitle {
+    font-size: 1rem;
+  }
+
+  .about-content {
+    padding: 3rem 1.5rem;
+  }
+
+  .about-section h2 {
+    font-size: 1.75rem;
+  }
+
+  .about-section p {
+    font-size: 1rem;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .about-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .about-card h3 {
+    font-size: 1.5rem;
+  }
+
+  .values-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .value-card {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-hero {
+    padding: 2.5rem 1rem;
+  }
+
+  .about-hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .about-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .about-content {
+    padding: 2rem 1rem;
+  }
+
+  .about-section {
+    margin-bottom: 3rem;
+  }
+
+  .about-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .about-section p {
+    font-size: 0.95rem;
+  }
+
+  .about-card {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .card-icon {
+    font-size: 2.5rem;
+  }
+
+  .about-card h3 {
+    font-size: 1.25rem;
+  }
+
+  .value-card h4 {
+    font-size: 1.1rem;
+  }
+
+  .value-card p {
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,450 @@
+.flight-booking-page {
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+.flight-booking-hero {
+  background: linear-gradient(135deg, #0a1628 0%, #1a2f4f 100%);
+  color: white;
+  padding: calc(72px + 4rem) 2rem 4rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.flight-booking-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&q=80') center/cover;
+  opacity: 0.15;
+  z-index: 0;
+}
+
+.flight-booking-hero h1 {
+  position: relative;
+  z-index: 1;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #D4AF37;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.025em;
+}
+
+.flight-booking-hero p {
+  position: relative;
+  z-index: 1;
+  font-size: 1.25rem;
+  color: #e5e7eb;
+  max-width: 600px;
+  margin: 0 auto;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+}
+
+.booking-section {
+  width: 100%;
+  background: white;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.booking-section h2 {
+  color: #111827;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  letter-spacing: -0.025em;
+}
+
+.booking-form {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #D4AF37;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 120px;
+}
+
+.radio-option:hover {
+  border-color: #D4AF37;
+  background: #fffef9;
+}
+
+.radio-option input[type="radio"] {
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #D4AF37;
+}
+
+.radio-option input[type="radio"]:checked + span {
+  color: #D4AF37;
+  font-weight: 600;
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+  border-color: #D4AF37;
+  background: #fffef9;
+}
+
+.radio-option span {
+  color: #374151;
+  font-size: 0.95rem;
+  user-select: none;
+}
+
+.autocomplete-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 2px solid #D4AF37;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: -2px;
+}
+
+.suggestion-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.2s ease;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: #fffef9;
+}
+
+.suggestion-main {
+  color: #111827;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.suggestion-sub {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.destination-input-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  align-items: flex-start;
+}
+
+.destination-input-group .autocomplete-wrapper {
+  flex: 1;
+}
+
+.remove-destination-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+
+.remove-destination-btn:hover {
+  background: #dc2626;
+}
+
+.add-destination-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border: 2px dashed #d1d5db;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.add-destination-btn:hover {
+  background: #e5e7eb;
+  border-color: #D4AF37;
+  color: #D4AF37;
+}
+
+.submit-btn {
+  width: 100%;
+  background: #D4AF37;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #c19b2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submit-message {
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.submit-message.success {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #10b981;
+}
+
+.submit-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #ef4444;
+}
+
+.instagram-deals-section {
+  background: linear-gradient(135deg, #0a1628 0%, #1a2f4f 100%);
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.instagram-deals-content {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.instagram-icon-wrapper {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.instagram-icon-large {
+  color: #D4AF37;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.instagram-deals-content h2 {
+  color: #D4AF37;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: -0.025em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.instagram-deals-content p {
+  color: #e5e7eb;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  font-weight: 400;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.instagram-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #E4405F 0%, #C13584 100%);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(228, 64, 95, 0.3);
+}
+
+.instagram-link-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(228, 64, 95, 0.4);
+  background: linear-gradient(135deg, #C13584 0%, #E4405F 100%);
+}
+
+.instagram-icon-btn {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+@media (max-width: 768px) {
+  .flight-booking-hero {
+    padding: calc(72px + 3rem) 1.5rem 3rem 1.5rem;
+  }
+
+  .flight-booking-hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .flight-booking-hero p {
+    font-size: 1rem;
+  }
+
+  .booking-section {
+    padding: 2rem 1.5rem;
+  }
+
+  .booking-section h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .radio-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .radio-option {
+    min-width: auto;
+  }
+
+  .instagram-deals-section {
+    padding: 3rem 1.5rem;
+  }
+
+  .instagram-deals-content h2 {
+    font-size: 1.75rem;
+  }
+
+  .instagram-deals-content p {
+    font-size: 1rem;
+  }
+
+  .instagram-link-btn {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .flight-booking-hero {
+    padding: calc(72px + 2.5rem) 1rem 2.5rem 1rem;
+  }
+
+  .flight-booking-hero h1 {
+    font-size: 2rem;
+  }
+
+  .booking-section {
+    padding: 2rem 1rem;
+  }
+
+  .booking-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .instagram-deals-section {
+    padding: 2.5rem 1rem;
+  }
+
+  .instagram-deals-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .instagram-link-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+  }
+}
