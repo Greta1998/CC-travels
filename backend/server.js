@@ -143,9 +143,8 @@ app.post('/api/book-flight', async (req, res) => {
     `;
 
     // Use Resend API to send email
-    // From address: Use your verified domain or Resend's default domain
-    // Format: "Display Name" <email@domain.com> or just email@domain.com
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'; // Default Resend domain for testing
+    // From address: Use your verified domain
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'info@cctravels.org';
     const toEmail = email || 'info@cctravels.org';
 
     console.log('Attempting to send email via Resend API...');
@@ -264,7 +263,7 @@ app.post('/api/contact', async (req, res) => {
     `;
 
     // Use Resend API to send email
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'info@cctravels.org';
     const toEmail = to || 'info@cctravels.org';
 
     console.log('Attempting to send contact email via Resend API...');
@@ -339,6 +338,6 @@ app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
   console.log('Environment check:');
   console.log('- RESEND_API_KEY:', process.env.RESEND_API_KEY ? '✓ Set' : '✗ Not set');
-  console.log('- RESEND_FROM_EMAIL:', process.env.RESEND_FROM_EMAIL || 'Using default (onboarding@resend.dev)');
+  console.log('- RESEND_FROM_EMAIL:', process.env.RESEND_FROM_EMAIL || 'Using default (info@cctravels.org)');
   console.log('- Resend configured:', resend ? '✓ Yes' : '✗ No');
 });
