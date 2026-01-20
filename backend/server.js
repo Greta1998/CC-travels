@@ -66,11 +66,14 @@ app.post('/api/book-flight', async (req, res) => {
       customerEmail: req.body.customerEmail
     });
 
+    // Check if transporter is configured
     if (!transporter) {
-      console.error('Email service not configured. EMAIL_USER and EMAIL_PASS must be set in .env file');
+      console.error('Email service not configured. EMAIL_USER and EMAIL_PASS must be set in environment variables');
+      console.error('EMAIL_USER exists:', !!process.env.EMAIL_USER);
+      console.error('EMAIL_PASS exists:', !!process.env.EMAIL_PASS);
       return res.status(500).json({ 
         success: false, 
-        message: 'Email service not configured. Please set up EMAIL_USER and EMAIL_PASS in the backend .env file.' 
+        message: 'Email service not configured. Please contact the administrator.' 
       });
     }
 
@@ -141,32 +144,49 @@ app.post('/api/book-flight', async (req, res) => {
     console.log('Email from:', mailOptions.from);
     console.log('Email to:', mailOptions.to);
     
-    // Add timeout to prevent hanging
-    const emailPromise = transporter.sendMail(mailOptions);
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Email sending timeout')), 30000)
-    );
-    
-    await Promise.race([emailPromise, timeoutPromise]);
-    console.log('Email sent successfully via Gmail SMTP');
+    try {
+      // Add timeout to prevent hanging
+      const emailPromise = transporter.sendMail(mailOptions);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Email sending timeout after 30 seconds')), 30000)
+      );
+      
+      await Promise.race([emailPromise, timeoutPromise]);
+      console.log('Email sent successfully via Gmail SMTP');
 
-    // Make sure response is sent
-    if (!res.headersSent) {
-      res.json({ 
-        success: true, 
-        message: 'Thank you! Your flight booking request has been submitted successfully.' 
-      });
+      // Make sure response is sent
+      if (!res.headersSent) {
+        res.json({ 
+          success: true, 
+          message: 'Thank you! Your flight booking request has been submitted successfully.' 
+        });
+      }
+    } catch (emailError) {
+      console.error('Error sending email:', emailError);
+      console.error('Email error code:', emailError.code);
+      console.error('Email error command:', emailError.command);
+      console.error('Email error response:', emailError.response);
+      console.error('Email error message:', emailError.message);
+      
+      // Make sure to send a response even if there's an error
+      if (!res.headersSent) {
+        res.status(500).json({ 
+          success: false, 
+          message: 'There was an error sending your booking request. Please try again later or contact us directly.' 
+        });
+      }
     }
   } catch (error) {
-    console.error('Error sending email:', error);
-    console.error('Error details:', error.message);
+    console.error('Unexpected error in /api/book-flight:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
     
     // Make sure to send a response even if there's an error
     if (!res.headersSent) {
       res.status(500).json({ 
         success: false, 
-        message: `Error submitting booking request: ${error.message || 'Please try again later.'}` 
+        message: 'An unexpected error occurred. Please try again later.' 
       });
     } else {
       console.error('Response already sent, cannot send error response');
@@ -178,10 +198,12 @@ app.post('/api/book-flight', async (req, res) => {
 app.post('/api/contact', async (req, res) => {
   try {
     if (!transporter) {
-      console.error('Email service not configured. EMAIL_USER and EMAIL_PASS must be set in .env file');
+      console.error('Email service not configured. EMAIL_USER and EMAIL_PASS must be set in environment variables');
+      console.error('EMAIL_USER exists:', !!process.env.EMAIL_USER);
+      console.error('EMAIL_PASS exists:', !!process.env.EMAIL_PASS);
       return res.status(500).json({ 
         success: false, 
-        message: 'Email service not configured. Please set up EMAIL_USER and EMAIL_PASS in the backend .env file.' 
+        message: 'Email service not configured. Please contact the administrator.' 
       });
     }
 
@@ -226,32 +248,49 @@ app.post('/api/contact', async (req, res) => {
     console.log('Email from:', mailOptions.from);
     console.log('Email to:', mailOptions.to);
     
-    // Add timeout to prevent hanging
-    const emailPromise = transporter.sendMail(mailOptions);
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Email sending timeout')), 30000)
-    );
-    
-    await Promise.race([emailPromise, timeoutPromise]);
-    console.log('Contact email sent successfully via Gmail SMTP');
+    try {
+      // Add timeout to prevent hanging
+      const emailPromise = transporter.sendMail(mailOptions);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Email sending timeout after 30 seconds')), 30000)
+      );
+      
+      await Promise.race([emailPromise, timeoutPromise]);
+      console.log('Contact email sent successfully via Gmail SMTP');
 
-    // Make sure response is sent
-    if (!res.headersSent) {
-      res.json({ 
-        success: true, 
-        message: 'Message sent successfully' 
-      });
+      // Make sure response is sent
+      if (!res.headersSent) {
+        res.json({ 
+          success: true, 
+          message: 'Message sent successfully' 
+        });
+      }
+    } catch (emailError) {
+      console.error('Error sending contact email:', emailError);
+      console.error('Email error code:', emailError.code);
+      console.error('Email error command:', emailError.command);
+      console.error('Email error response:', emailError.response);
+      console.error('Email error message:', emailError.message);
+      
+      // Make sure to send a response even if there's an error
+      if (!res.headersSent) {
+        res.status(500).json({ 
+          success: false, 
+          message: 'There was an error sending your message. Please try again later or contact us directly.' 
+        });
+      }
     }
   } catch (error) {
-    console.error('Error sending email:', error);
-    console.error('Error details:', error.message);
+    console.error('Unexpected error in /api/contact:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
     
     // Make sure to send a response even if there's an error
     if (!res.headersSent) {
       res.status(500).json({ 
         success: false, 
-        message: `Error sending message: ${error.message || 'Please try again later.'}` 
+        message: 'An unexpected error occurred. Please try again later.' 
       });
     } else {
       console.error('Response already sent, cannot send error response');
@@ -262,4 +301,8 @@ app.post('/api/contact', async (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+  console.log('Environment check:');
+  console.log('- EMAIL_USER:', process.env.EMAIL_USER ? '✓ Set' : '✗ Not set');
+  console.log('- EMAIL_PASS:', process.env.EMAIL_PASS ? '✓ Set' : '✗ Not set');
+  console.log('- Transporter configured:', transporter ? '✓ Yes' : '✗ No');
 });
