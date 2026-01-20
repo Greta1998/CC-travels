@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import './Services.css'
 
 const Services = () => {
@@ -107,7 +108,7 @@ const Services = () => {
         <div className="services-cta">
           <h2>Ready to Plan Your Next Adventure?</h2>
           <p>Contact us today to discuss your travel needs and let us help you create the perfect journey.</p>
-          <a href="/contact-us" className="cta-button">Get In Touch</a>
+          <Link to="/contact-us" className="cta-button">Get In Touch</Link>
         </div>
       </div>
     </div>
