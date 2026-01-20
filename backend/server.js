@@ -41,21 +41,33 @@ app.use(express.urlencoded({ extended: true }));
 let transporter = null;
 if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
   try {
+    // Use explicit SMTP configuration instead of 'service: gmail' for better control
     transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false, // true for 465, false for other ports
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
       },
       tls: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
+        ciphers: 'SSLv3'
       },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000
+      // Increased timeouts for Render's network
+      connectionTimeout: 60000, // 60 seconds
+      greetingTimeout: 30000, // 30 seconds
+      socketTimeout: 60000, // 60 seconds
+      // Additional options for better reliability
+      pool: true,
+      maxConnections: 1,
+      maxMessages: 3,
+      rateDelta: 1000,
+      rateLimit: 5
     });
     console.log('Gmail SMTP transporter configured successfully');
     console.log('Email user:', process.env.EMAIL_USER);
+    console.log('SMTP host: smtp.gmail.com:587');
   } catch (error) {
     console.error('Error creating email transporter:', error);
     console.warn('Email functionality will not work.');
@@ -78,7 +90,13 @@ app.get('/api', (req, res) => {
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
+  res.json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    emailConfigured: !!transporter,
+    hasEmailUser: !!process.env.EMAIL_USER,
+    hasEmailPass: !!process.env.EMAIL_PASS
+  });
 });
 
 // Book flight endpoint
@@ -169,14 +187,46 @@ app.post('/api/book-flight', async (req, res) => {
     console.log('Email to:', mailOptions.to);
     
     try {
-      // Add timeout to prevent hanging
-      const emailPromise = transporter.sendMail(mailOptions);
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Email sending timeout after 30 seconds')), 30000)
-      );
+      // Retry logic for connection timeouts
+      let lastError = null;
+      const maxRetries = 3;
+      let success = false;
       
-      await Promise.race([emailPromise, timeoutPromise]);
-      console.log('Email sent successfully via Gmail SMTP');
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          console.log(`Email send attempt ${attempt} of ${maxRetries}...`);
+          
+          // Add timeout to prevent hanging (increased for Render)
+          const emailPromise = transporter.sendMail(mailOptions);
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Email sending timeout after 60 seconds')), 60000)
+          );
+          
+          await Promise.race([emailPromise, timeoutPromise]);
+          console.log('Email sent successfully via Gmail SMTP');
+          success = true;
+          break;
+        } catch (retryError) {
+          lastError = retryError;
+          console.error(`Attempt ${attempt} failed:`, retryError.message);
+          
+          // Only retry on connection/timeout errors
+          if (retryError.code === 'ETIMEDOUT' || retryError.code === 'ECONNECTION' || retryError.message.includes('timeout')) {
+            if (attempt < maxRetries) {
+              const waitTime = attempt * 2000; // 2s, 4s, 6s
+              console.log(`Retrying in ${waitTime}ms...`);
+              await new Promise(resolve => setTimeout(resolve, waitTime));
+              continue;
+            }
+          }
+          // For other errors, don't retry
+          throw retryError;
+        }
+      }
+      
+      if (!success) {
+        throw lastError || new Error('Failed to send email after all retries');
+      }
 
       // Make sure response is sent
       if (!res.headersSent) {
@@ -191,12 +241,26 @@ app.post('/api/book-flight', async (req, res) => {
       console.error('Email error command:', emailError.command);
       console.error('Email error response:', emailError.response);
       console.error('Email error message:', emailError.message);
+      console.error('Full error:', JSON.stringify(emailError, Object.getOwnPropertyNames(emailError)));
       
       // Make sure to send a response even if there's an error
       if (!res.headersSent) {
+        // Provide more helpful error message based on error type
+        let errorMessage = 'There was an error sending your booking request. Please try again later or contact us directly.';
+        
+        if (emailError.code === 'EAUTH') {
+          errorMessage = 'Email authentication failed. Please contact the administrator.';
+        } else if (emailError.code === 'ECONNECTION' || emailError.code === 'ETIMEDOUT' || emailError.code === 'ETIMEOUT') {
+          errorMessage = 'Could not connect to email service. This may be a temporary network issue. Please try again in a few moments.';
+          console.error('Connection timeout - this may be due to Render network restrictions or Gmail SMTP blocking.');
+        } else if (emailError.message && emailError.message.includes('timeout')) {
+          errorMessage = 'Email service timed out. Please try again.';
+        }
+        
         res.status(500).json({ 
           success: false, 
-          message: 'There was an error sending your booking request. Please try again later or contact us directly.' 
+          message: errorMessage,
+          error: process.env.NODE_ENV === 'development' ? emailError.message : undefined
         });
       }
     }
@@ -205,12 +269,14 @@ app.post('/api/book-flight', async (req, res) => {
     console.error('Error name:', error.name);
     console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
+    console.error('Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     
     // Make sure to send a response even if there's an error
     if (!res.headersSent) {
       res.status(500).json({ 
         success: false, 
-        message: 'An unexpected error occurred. Please try again later.' 
+        message: 'An unexpected error occurred. Please try again later.',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     } else {
       console.error('Response already sent, cannot send error response');
