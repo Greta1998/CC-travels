@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 dotenv.config();
 
@@ -37,50 +37,21 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Gmail SMTP email configuration
-let transporter = null;
-if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+// Resend API email configuration
+let resend = null;
+if (process.env.RESEND_API_KEY) {
   try {
-    // Use explicit SMTP configuration instead of 'service: gmail' for better control
-    transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      },
-      tls: {
-        rejectUnauthorized: false,
-        ciphers: 'SSLv3'
-      },
-      // Increased timeouts for Render's network
-      connectionTimeout: 60000, // 60 seconds
-      greetingTimeout: 30000, // 30 seconds
-      socketTimeout: 60000, // 60 seconds
-      // Additional options for better reliability
-      pool: true,
-      maxConnections: 1,
-      maxMessages: 3,
-      rateDelta: 1000,
-      rateLimit: 5
-    });
-    console.log('Gmail SMTP transporter configured successfully');
-    console.log('Email user:', process.env.EMAIL_USER);
-    console.log('SMTP host: smtp.gmail.com:587');
+    resend = new Resend(process.env.RESEND_API_KEY);
+    console.log('Resend API configured successfully');
   } catch (error) {
-    console.error('Error creating email transporter:', error);
+    console.error('Error creating Resend client:', error);
     console.warn('Email functionality will not work.');
   }
 } else {
-  console.warn('Warning: Email credentials not configured. Email functionality will not work.');
-  console.warn('Please set EMAIL_USER and EMAIL_PASS in your .env file');
-  console.warn('Example:');
-  console.warn('  EMAIL_USER=gretatunga@gmail.com');
-  console.warn('  EMAIL_PASS=your_gmail_app_password');
-  console.warn('');
-  console.warn('Note: For Gmail, you need to use an App Password, not your regular password.');
-  console.warn('Get one at: https://myaccount.google.com/apppasswords');
+  console.warn('Warning: Resend API key not configured. Email functionality will not work.');
+  console.warn('Please set RESEND_API_KEY in your environment variables');
+  console.warn('Get your API key at: https://resend.com/api-keys');
+  console.warn('You also need to verify your domain or use the default sending domain.');
 }
 
 // Routes
@@ -93,9 +64,8 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'Server is running',
-    emailConfigured: !!transporter,
-    hasEmailUser: !!process.env.EMAIL_USER,
-    hasEmailPass: !!process.env.EMAIL_PASS
+    emailConfigured: !!resend,
+    hasResendApiKey: !!process.env.RESEND_API_KEY
   });
 });
 
@@ -108,11 +78,10 @@ app.post('/api/book-flight', async (req, res) => {
       customerEmail: req.body.customerEmail
     });
 
-    // Check if transporter is configured
-    if (!transporter) {
-      console.error('Email service not configured. EMAIL_USER and EMAIL_PASS must be set in environment variables');
-      console.error('EMAIL_USER exists:', !!process.env.EMAIL_USER);
-      console.error('EMAIL_PASS exists:', !!process.env.EMAIL_PASS);
+    // Check if Resend is configured
+    if (!resend) {
+      console.error('Email service not configured. RESEND_API_KEY must be set in environment variables');
+      console.error('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
       return res.status(500).json({ 
         success: false, 
         message: 'Email service not configured. Please contact the administrator.' 
@@ -173,60 +142,33 @@ app.post('/api/book-flight', async (req, res) => {
       ${description ? `<p><strong>Additional Preferences:</strong><br>${description.replace(/\n/g, '<br>')}</p>` : ''}
     `;
 
-    const mailOptions = {
-      from: `"Support" <${process.env.EMAIL_USER || 'gretatunga@gmail.com'}>`,
-      to: email || 'info@cctravels.org',
-      subject: 'New Flight Booking Request - CC Travels',
-      text: emailContent,
-      html: htmlContent,
-      replyTo: customerEmail || undefined
-    };
+    // Use Resend API to send email
+    // From address: Use your verified domain or Resend's default domain
+    // Format: "Display Name" <email@domain.com> or just email@domain.com
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'; // Default Resend domain for testing
+    const toEmail = email || 'info@cctravels.org';
 
-    console.log('Attempting to send email via Gmail SMTP...');
-    console.log('Email from:', mailOptions.from);
-    console.log('Email to:', mailOptions.to);
+    console.log('Attempting to send email via Resend API...');
+    console.log('Email from:', fromEmail);
+    console.log('Email to:', toEmail);
     
     try {
-      // Retry logic for connection timeouts
-      let lastError = null;
-      const maxRetries = 3;
-      let success = false;
-      
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-          console.log(`Email send attempt ${attempt} of ${maxRetries}...`);
-          
-          // Add timeout to prevent hanging (increased for Render)
-          const emailPromise = transporter.sendMail(mailOptions);
-          const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Email sending timeout after 60 seconds')), 60000)
-          );
-          
-          await Promise.race([emailPromise, timeoutPromise]);
-          console.log('Email sent successfully via Gmail SMTP');
-          success = true;
-          break;
-        } catch (retryError) {
-          lastError = retryError;
-          console.error(`Attempt ${attempt} failed:`, retryError.message);
-          
-          // Only retry on connection/timeout errors
-          if (retryError.code === 'ETIMEDOUT' || retryError.code === 'ECONNECTION' || retryError.message.includes('timeout')) {
-            if (attempt < maxRetries) {
-              const waitTime = attempt * 2000; // 2s, 4s, 6s
-              console.log(`Retrying in ${waitTime}ms...`);
-              await new Promise(resolve => setTimeout(resolve, waitTime));
-              continue;
-            }
-          }
-          // For other errors, don't retry
-          throw retryError;
-        }
+      const { data, error } = await resend.emails.send({
+        from: `CC Travels <${fromEmail}>`,
+        to: [toEmail],
+        replyTo: customerEmail || undefined,
+        subject: 'New Flight Booking Request - CC Travels',
+        text: emailContent,
+        html: htmlContent,
+      });
+
+      if (error) {
+        console.error('Resend API error:', error);
+        throw new Error(error.message || 'Failed to send email via Resend');
       }
-      
-      if (!success) {
-        throw lastError || new Error('Failed to send email after all retries');
-      }
+
+      console.log('Email sent successfully via Resend API');
+      console.log('Email ID:', data?.id);
 
       // Make sure response is sent
       if (!res.headersSent) {
@@ -248,13 +190,10 @@ app.post('/api/book-flight', async (req, res) => {
         // Provide more helpful error message based on error type
         let errorMessage = 'There was an error sending your booking request. Please try again later or contact us directly.';
         
-        if (emailError.code === 'EAUTH') {
-          errorMessage = 'Email authentication failed. Please contact the administrator.';
-        } else if (emailError.code === 'ECONNECTION' || emailError.code === 'ETIMEDOUT' || emailError.code === 'ETIMEOUT') {
-          errorMessage = 'Could not connect to email service. This may be a temporary network issue. Please try again in a few moments.';
-          console.error('Connection timeout - this may be due to Render network restrictions or Gmail SMTP blocking.');
-        } else if (emailError.message && emailError.message.includes('timeout')) {
-          errorMessage = 'Email service timed out. Please try again.';
+        if (emailError.message && emailError.message.includes('domain')) {
+          errorMessage = 'Email domain not verified. Please contact the administrator.';
+        } else if (emailError.message && (emailError.message.includes('API key') || emailError.message.includes('unauthorized'))) {
+          errorMessage = 'Email service configuration error. Please contact the administrator.';
         }
         
         res.status(500).json({ 
@@ -287,10 +226,9 @@ app.post('/api/book-flight', async (req, res) => {
 // Contact form endpoint
 app.post('/api/contact', async (req, res) => {
   try {
-    if (!transporter) {
-      console.error('Email service not configured. EMAIL_USER and EMAIL_PASS must be set in environment variables');
-      console.error('EMAIL_USER exists:', !!process.env.EMAIL_USER);
-      console.error('EMAIL_PASS exists:', !!process.env.EMAIL_PASS);
+    if (!resend) {
+      console.error('Email service not configured. RESEND_API_KEY must be set in environment variables');
+      console.error('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
       return res.status(500).json({ 
         success: false, 
         message: 'Email service not configured. Please contact the administrator.' 
@@ -325,28 +263,31 @@ app.post('/api/contact', async (req, res) => {
       <p>${message.replace(/\n/g, '<br>')}</p>
     `;
 
-    const mailOptions = {
-      from: `"Support" <${process.env.EMAIL_USER || 'gretatunga@gmail.com'}>`,
-      to: to || 'info@cctravels.org',
-      subject: `Contact Form: ${subject}`,
-      text: emailContent,
-      html: htmlContent,
-      replyTo: email
-    };
+    // Use Resend API to send email
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+    const toEmail = to || 'info@cctravels.org';
 
-    console.log('Attempting to send contact email via Gmail SMTP...');
-    console.log('Email from:', mailOptions.from);
-    console.log('Email to:', mailOptions.to);
+    console.log('Attempting to send contact email via Resend API...');
+    console.log('Email from:', fromEmail);
+    console.log('Email to:', toEmail);
     
     try {
-      // Add timeout to prevent hanging
-      const emailPromise = transporter.sendMail(mailOptions);
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Email sending timeout after 30 seconds')), 30000)
-      );
-      
-      await Promise.race([emailPromise, timeoutPromise]);
-      console.log('Contact email sent successfully via Gmail SMTP');
+      const { data, error } = await resend.emails.send({
+        from: `CC Travels <${fromEmail}>`,
+        to: [toEmail],
+        replyTo: email,
+        subject: `Contact Form: ${subject}`,
+        text: emailContent,
+        html: htmlContent,
+      });
+
+      if (error) {
+        console.error('Resend API error:', error);
+        throw new Error(error.message || 'Failed to send email via Resend');
+      }
+
+      console.log('Contact email sent successfully via Resend API');
+      console.log('Email ID:', data?.id);
 
       // Make sure response is sent
       if (!res.headersSent) {
@@ -357,16 +298,21 @@ app.post('/api/contact', async (req, res) => {
       }
     } catch (emailError) {
       console.error('Error sending contact email:', emailError);
-      console.error('Email error code:', emailError.code);
-      console.error('Email error command:', emailError.command);
-      console.error('Email error response:', emailError.response);
       console.error('Email error message:', emailError.message);
+      console.error('Full error:', JSON.stringify(emailError, Object.getOwnPropertyNames(emailError)));
       
       // Make sure to send a response even if there's an error
       if (!res.headersSent) {
+        let errorMessage = 'There was an error sending your message. Please try again later or contact us directly.';
+        
+        if (emailError.message && emailError.message.includes('domain')) {
+          errorMessage = 'Email domain not verified. Please contact the administrator.';
+        }
+        
         res.status(500).json({ 
           success: false, 
-          message: 'There was an error sending your message. Please try again later or contact us directly.' 
+          message: errorMessage,
+          error: process.env.NODE_ENV === 'development' ? emailError.message : undefined
         });
       }
     }
@@ -392,7 +338,7 @@ app.post('/api/contact', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
   console.log('Environment check:');
-  console.log('- EMAIL_USER:', process.env.EMAIL_USER ? '✓ Set' : '✗ Not set');
-  console.log('- EMAIL_PASS:', process.env.EMAIL_PASS ? '✓ Set' : '✗ Not set');
-  console.log('- Transporter configured:', transporter ? '✓ Yes' : '✗ No');
+  console.log('- RESEND_API_KEY:', process.env.RESEND_API_KEY ? '✓ Set' : '✗ Not set');
+  console.log('- RESEND_FROM_EMAIL:', process.env.RESEND_FROM_EMAIL || 'Using default (onboarding@resend.dev)');
+  console.log('- Resend configured:', resend ? '✓ Yes' : '✗ No');
 });
