@@ -41,6 +41,16 @@ const Footer = () => {
                 luxury_express_tours
               </a>
             </li>
+            <li>
+              <a 
+                href="https://www.google.com/maps/search/?api=1&query=KG+1+Avenue%2C+A%26F+Plaza%2C+Next+to+Rubis+station%2C+2nd+Floor%2C+Door+6%2C+Kigali%2C+Rwanda" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="address-link"
+              >
+                📍 KG 1 Avenue, A&F Plaza, Next to Rubis station, 2nd Floor, Door 6.
+              </a>
+            </li>
           </ul>
         </div>
 

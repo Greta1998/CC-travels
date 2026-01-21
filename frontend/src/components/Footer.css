@@ -84,6 +84,14 @@
   fill: #D4AF37;
 }
 
+.address-link {
+  transition: color 0.3s ease;
+}
+
+.address-link:hover {
+  color: #D4AF37 !important;
+}
+
 .footer-section p {
   color: #9ca3af;
   font-size: 0.9rem;
